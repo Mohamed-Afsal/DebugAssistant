@@ -1,0 +1,93 @@
+# logs_debugger.py
+
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="pymilvus")
+
+import os
+from llama_index.core import VectorStoreIndex, Document
+from llama_index.vector_stores.milvus import MilvusVectorStore
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.core import Settings
+from ibm_watson_machine_learning.foundation_models.utils.enums import ModelTypes
+from ibm_watson_machine_learning.metanames import GenTextParamsMetaNames as GenParams
+from ibm_watson_machine_learning.foundation_models import Model
+
+# Initialize embedding and model
+Settings.embed_model = HuggingFaceEmbedding(
+    model_name="mixedbread-ai/mxbai-embed-large-v1"
+)
+
+credentials = {
+    "url": "https://us-south.ml.cloud.ibm.com",
+    "apikey": os.getenv("WML_API_KEY")
+}
+
+project_id = os.getenv("WML_PROJECT_ID")
+model_id = "mistralai/mixtral-8x7b-instruct-v01"
+
+parameters = {
+    GenParams.MAX_NEW_TOKENS: 2000
+}
+
+LLM_model_watsonX = Model(
+    model_id=model_id,
+    params=parameters,
+    credentials=credentials,
+    project_id=project_id
+)
+
+def extract_error_context(log_file, lines_before=25, lines_after=25):
+    with open(log_file, 'r') as file:
+        lines = file.readlines()
+
+    error_indices = [i for i, line in enumerate(lines) if "error" in line.lower()]
+    
+    if not error_indices:
+        return "No ERROR logs found."
+
+    result = []
+    start = max(error_indices[0] - lines_before, 0)
+    end = min(error_indices[0] + lines_after + 1, len(lines))
+
+    for i in range(1, len(error_indices)):
+        next_start = max(error_indices[i] - lines_before, 0)
+        next_end = min(error_indices[i] + lines_after + 1, len(lines))
+
+        if next_start <= end:
+            end = max(end, next_end)
+        else:
+            result.append(''.join(lines[start:end]))
+            result.append("=" * 80)
+            start, end = next_start, next_end
+
+    result.append(''.join(lines[start:end]))
+    return '\n'.join(result)
+
+def process_query(log_file_path, user_question):
+    """Main function to call from Flask"""
+    try:
+        # Step 1: Extract error-relevant content
+        text_errors = extract_error_context(log_file_path)
+        text_list = [text_errors]
+        documents = [Document(text=t) for t in text_list]
+        
+        # Step 2: Index documents
+        vec_index = VectorStoreIndex.from_documents(documents=documents, show_progress=True)
+        query_engine = vec_index.as_retriever(similarity_top_k=6)
+        
+        # Step 3: Retrieve relevant parts
+        top_k_nodes = query_engine.retrieve(user_question)
+        
+        # Step 4: Prepare prompt for WatsonX
+        str_to_be_sent_to_wx = '''You are a debug assistant from the given logs below. You have to answer the user's question and help identify the root cause.\n\nLogs:\n'''
+        for node in top_k_nodes:
+            str_to_be_sent_to_wx += node.text + "\n"
+        str_to_be_sent_to_wx += f"\nQuestion: {user_question}"
+
+        # Step 5: Get response from WatsonX
+        response = LLM_model_watsonX.generate_text(prompt=str_to_be_sent_to_wx)
+        return response
+
+    except Exception as e:
+        return f"Error occurred: {str(e)}"
+

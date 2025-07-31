@@ -1,0 +1,357 @@
+{"timestamp":"2024-08-28T20:19:15+0000","caller-info":"31 ./scripts/log.sh","type":"INFO","message":"Waiting for Sidecar..."}
+HTTP/1.1 200 OK
+date: Wed, 28 Aug 2024 20:19:18 GMT
+x-envoy-upstream-service-time: 0
+server: envoy
+transfer-encoding: chunked
+
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"31 ./scripts/log.sh","type":"INFO","message":"Sidecar available. Running the command..."}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"31 ./scripts/log.sh","type":"INFO","message":"Upgrading OpenPages Database..."}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"31 ./scripts/log.sh","type":"INFO","message":"Updating sql-wrapper.sql..."}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"31 ./scripts/log.sh","type":"INFO","message":"Update DB Configurations script not found, skipping..."}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"In script: upgrade_db.sh"}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"- DbInstance: 3d0b32ac-8d6d-4fab-9351-8345a8e7f9e3"}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"- Host: grc-saas-oracle-dev-a0a71596.cvbqtqwlohis.us-east-1.rds.amazonaws.com"}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"- Port: 2484"}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"- Alias: OP"}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"- User: xxxxx"}
+{"timestamp":"2024-08-28T20:19:18+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"- DBA User: admin"}
+{"timestamp":"2024-08-28T20:19:23+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"Current schema version is 9.0.0.4"}
+{"timestamp":"2024-08-28T20:19:23+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"New schema version is 9.0.0.4 "}
+{"timestamp":"2024-08-28T20:19:23+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"Running script to upgrade database from 9.0.0.4 to version 9.0.0.4 "}
+{"timestamp":"2024-08-28T20:19:23+0000","caller-info":"22 updateSQLWrapper /scripts/_update_sql_wrapper.sh","type":"INFO","message":"Updating /opdbInstall/UPGRADE_SCRIPTS/sql-wrapper.sql"}
+{"timestamp":"2024-08-28T20:19:23+0000","caller-info":"36 updateSQLWrapper /scripts/_update_sql_wrapper.sh","type":"INFO","message":"updated sqlwrapper"}
+Retrived oracle certificate
+Added wallet config
+Added TNS config
+{"timestamp":"2024-08-28T20:19:23+0000","caller-info":"37 logInfo /scripts/log.sh","type":"INFO","message":"Running pre-upgrade DBA step"}
+[2024-08-28 20:19:23+00:00] [op-database-dba-upgrade.sh] Checking current step status from status file: op-database-dba-upgrade.pre.status.log
+[2024-08-28 20:19:24+00:00] [op-database-dba-upgrade.sh] TNS_NAME_ALIAS=OPXSSL
+[2024-08-28 20:19:24+00:00] [op-database-dba-upgrade.sh] DBA_USER_NAME=admin
+[2024-08-28 20:19:24+00:00] [op-database-dba-upgrade.sh] OP_USER_NAME=xxxxxxx
+[2024-08-28 20:19:24+00:00] [op-database-dba-upgrade.sh] AWS_SAAS_INSTALL=Y
+[2024-08-28 20:19:24+00:00] [op-database-dba-upgrade.sh] Running op-database-save-version.sql
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Wed Aug 28 20:19:24 2024
+Version 21.5.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+SQL> set trimout on
+SQL> set trimspool on
+SQL> set linesize 2000
+SQL> 
+SQL> prompt [&&scriptname] Getting version from schemaversion
+[op-database-save-version.sql] Getting version from schemaversion
+SQL> 
+SQL> set verify off
+SQL> conn &database_user_name/"&database_password"@&connect_identifier
+Connected.
+SQL> 
+SQL> column name format a14
+SQL> column schemaversion format a10
+SQL> 
+SQL> select 'schemaversion' name,
+  2    trim(substr(version, instr(version, ' ',1,1) + 1, instr(version, ' ',1,2) - instr(version, ' ',1,1) - 1)) schemaversion
+  3    from &opx_user_name..schemaversion where modificationdate = (select max(modificationdate) from &opx_user_name..schemaversion	) and rownum < 2;
+
+NAME	       SCHEMAVERS
+-------------- ----------
+schemaversion  9.0.0.4
+
+SQL> 
+SQL> prompt [&&scriptname] Finished getting version from schemaversion
+[op-database-save-version.sql] Finished getting version from schemaversion
+SQL> spool off
+SQL> exit success
+Disconnected from Oracle Database 19c Standard Edition 2 Release 19.0.0.0.0 - Production
+Version 19.22.0.0.0
+[2024-08-28 20:19:24+00:00] [op-database-dba-upgrade.sh] Running op-database-dba-upgrade.pre.sql
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Wed Aug 28 20:19:24 2024
+Version 21.5.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+SQL> set trimout on
+SQL> set trimspool on
+SQL> set linesize 2000
+SQL> set time on
+20:19:24 SQL> 
+20:19:24 SQL> Prompt [&&scriptname] DBA upgrade steps to be run prior to OpenPages product upgrade.
+[op-database-dba-upgrade.pre.sql] DBA upgrade steps to be run prior to OpenPages product upgrade.
+20:19:24 SQL> Prompt [&&scriptname] using connect_identifier=&&connect_identifier
+[op-database-dba-upgrade.pre.sql] using connect_identifier=OPXSSL
+20:19:24 SQL> Prompt [&&scriptname] using dba_user_name=&&dba_user_name
+[op-database-dba-upgrade.pre.sql] using dba_user_name=xxxxx
+20:19:24 SQL> Prompt [&&scriptname] using opx_user_name=&&opx_user_name
+[op-database-dba-upgrade.pre.sql] using opx_user_name=xxxxxx
+20:19:24 SQL> Prompt [&&scriptname] using current_version=&&current_version
+[op-database-dba-upgrade.pre.sql] using current_version=9.0.0.4
+20:19:24 SQL> Prompt [&&scriptname] using target_build=&&target_build
+[op-database-dba-upgrade.pre.sql] using target_build=OpenPages 9.0.0.4 Build 4510 2024/08/28
+20:19:24 SQL> 
+20:19:24 SQL> 
+20:19:24 SQL> set verify off
+20:19:24 SQL> conn &dba_user_name/"&dba_password"@&connect_identifier
+Connected.
+20:19:24 SQL> 
+20:19:24 SQL> declare
+20:19:24   2  	l_grantee		 dba_role_privs.grantee%type;
+20:19:24   3  	l_value 		 v$parameter.value%type;
+20:19:24   4  	l_target_version	 varchar2(200);
+20:19:24   5  	l_current_major_version  varchar2(200);
+20:19:24   6  	l_current_primary_version  varchar2(200);
+20:19:24   7  
+20:19:24   8  	-- list of read and execute grants needed for 8.2
+20:19:24   9  	l_grant_list_read varchar2(4000) := q'[
+20:19:24  10  	  'ALL_PROCEDURES',
+20:19:24  11  	  'ALL_TAB_PRIVS',
+20:19:24  12  	  'NLS_SESSION_PARAMETERS',
+20:19:24  13  	  'PRODUCT_COMPONENT_VERSION',
+20:19:24  14  	  'USER_CONSTRAINTS',
+20:19:24  15  	  'USER_CONS_COLUMNS',
+20:19:24  16  	  'USER_DB_LINKS',
+20:19:24  17  	  'USER_INDEXES',
+20:19:24  18  	  'USER_IND_COLUMNS',
+20:19:24  19  	  'USER_OBJECTS',
+20:19:24  20  	  'USER_SEGMENTS',
+20:19:24  21  	  'USER_SEQUENCES',
+20:19:24  22  	  'USER_SOURCE',
+20:19:24  23  	  'USER_TABLES',
+20:19:24  24  	  'USER_TABLESPACES',
+20:19:24  25  	  'USER_TAB_COLS',
+20:19:24  26  	  'USER_TAB_COLUMNS',
+20:19:24  27  	  'USER_TRIGGERS'
+20:19:24  28  	  ]';
+20:19:24  29  	l_grant_list_read_checkonly varchar2(4000) := q'[
+20:19:24  30  	  'GV_$SQL',
+20:19:24  31  	  'V_$SQL',
+20:19:24  32  	  'V_$SQL_PLAN',
+20:19:24  33  	  'V_$SESSION',
+20:19:24  34  	  'V_$SQL_PLAN_STATISTICS_ALL',
+20:19:24  35  	  'V_$OSSTAT',
+20:19:24  36  	  'V_$SYSSTAT',
+20:19:24  37  	  'V_$LIBRARYCACHE',
+20:19:24  38  	  'V_$SYSTEM_EVENT',
+20:19:24  39  	  'V_$SYS_TIME_MODEL',
+20:19:24  40  	  'V_$SEGMENT_STATISTICS'
+20:19:24  41  	  ]';
+20:19:24  42  	l_grant_list_read_aws varchar2(4000) := q'[
+20:19:24  43  	  'ALL_PROCEDURES',
+20:19:24  44  	  'ALL_TAB_PRIVS',
+20:19:24  45  	  'NLS_SESSION_PARAMETERS',
+20:19:24  46  	  'PRODUCT_COMPONENT_VERSION',
+20:19:24  47  	  'USER_CONSTRAINTS',
+20:19:24  48  	  'USER_CONS_COLUMNS',
+20:19:24  49  	  'USER_DB_LINKS',
+20:19:24  50  	  'USER_INDEXES',
+20:19:24  51  	  'USER_IND_COLUMNS',
+20:19:24  52  	  'USER_OBJECTS',
+20:19:24  53  	  'USER_SEGMENTS',
+20:19:24  54  	  'USER_SEQUENCES',
+20:19:24  55  	  'USER_SOURCE',
+20:19:24  56  	  'USER_TABLES',
+20:19:24  57  	  'USER_TABLESPACES',
+20:19:24  58  	  'USER_TAB_COLS',
+20:19:24  59  	  'USER_TAB_COLUMNS',
+20:19:24  60  	  'USER_TRIGGERS',
+20:19:24  61  	  'GV$SQL',
+20:19:24  62  	  'V$SQL',
+20:19:24  63  	  'V$SQL_PLAN',
+20:19:24  64  	  'V$SESSION',
+20:19:24  65  	  'V$SQL_PLAN_STATISTICS_ALL',
+20:19:24  66  	  'V$SQLCOMMAND',
+20:19:24  67  	  'V$OSSTAT',
+20:19:24  68  	  'V$SYSSTAT',
+20:19:24  69  	  'V$LIBRARYCACHE',
+20:19:24  70  	  'V$SYSTEM_EVENT',
+20:19:24  71  	  'V$SYS_TIME_MODEL',
+20:19:24  72  	  'V$SYSTEM_WAIT_CLASS',
+20:19:24  73  	  'V$FILESTAT',
+20:19:24  74  	  'V$SEGMENT_STATISTICS'
+20:19:24  75  	  ]';
+20:19:24  76  	l_grant_list_execute varchar2(4000) := q'[
+20:19:24  77  	  'DBMS_CRYPTO',
+20:19:24  78  	  'DBMS_JOB',
+20:19:24  79  	  'DBMS_LOB',
+20:19:24  80  	  'DBMS_OUTPUT',
+20:19:24  81  	  'DBMS_RANDOM',
+20:19:24  82  	  'DBMS_SESSION',
+20:19:24  83  	  'DBMS_SNAPSHOT',
+20:19:24  84  	  'DBMS_SQL',
+20:19:24  85  	  'DBMS_STANDARD',
+20:19:24  86  	  'DBMS_STATS',
+20:19:24  87  	  'DBMS_UTILITY',
+20:19:24  88  	  'DBMS_XPLAN',
+20:19:24  89  	  'ODCICONST',
+20:19:24  90  	  'PLITBLM',
+20:19:24  91  	  'STANDARD'
+20:19:24  92  	  ]';
+20:19:24  93  	l_grant_list_select varchar2(4000) := q'[
+20:19:24  94  	  'PLAN_TABLE$'
+20:19:24  95  	  ]';
+20:19:24  96  	l_grant_list_insert varchar2(4000) := q'[
+20:19:24  97  	  'PLAN_TABLE$'
+20:19:24  98  	  ]';
+20:19:24  99  	l_grant_list_update varchar2(4000) := q'[
+20:19:24 100  	  'PLAN_TABLE$'
+20:19:24 101  	  ]';
+20:19:24 102  	l_grant_list_delete varchar2(4000) := q'[
+20:19:24 103  	  'PLAN_TABLE$'
+20:19:24 104  	  ]';
+20:19:24 105  
+20:19:24 106  	procedure check_grants ( p_user varchar2, p_grant_list varchar2, p_privilege varchar2, p_action varchar2 )
+20:19:24 107  	as
+20:19:24 108  	begin
+20:19:24 109  	  execute immediate '
+20:19:24 110  	    Declare
+20:19:24 111  	      v_cmd varchar2(4000);
+20:19:24 112  	      v_error_found boolean := FALSE;
+20:19:24 113  	    Begin
+20:19:24 114  	      dbms_output.put_line(''[&&scriptname] Checking ' || upper(p_privilege) || ' grants...'');
+20:19:24 115  	      for rec in (    select column_value as table_name
+20:19:24 116  			       from table(sys.dbms_debug_vc2coll( ' || p_grant_list || ') )
+20:19:24 117  			      minus
+20:19:24 118  			      select distinct table_name
+20:19:24 119  				from dba_tab_privs
+20:19:24 120  			       where grantee in (''' || upper(p_user) || ''', ''PUBLIC'')
+20:19:24 121  				 and table_name in ( ' || p_grant_list || ' )
+20:19:24 122  				 and privilege = ''' || p_privilege || '''
+20:19:24 123  			  )
+20:19:24 124  	      loop
+20:19:24 125  		 if ''' || p_action || ''' = ''APPLY'' then
+20:19:24 126  		   v_cmd := ''Grant ' || p_privilege || ' on '' || rec.table_name || '' to ' || p_user || ' '';
+20:19:24 127  		   dbms_output.put_line(v_cmd);
+20:19:24 128  		   execute immediate v_cmd;
+20:19:24 129  		 elsif ''' || p_action || ''' = ''CHECK'' then
+20:19:24 130  		   dbms_output.put_line(''[&&scriptname] Privilege ' || upper(p_privilege) || ' is missing from '' || rec.table_name || ''!'');
+20:19:24 131  		   v_error_found := TRUE;
+20:19:24 132  		 end if;
+20:19:24 133  	      end loop;
+20:19:24 134  	      if v_error_found = TRUE then
+20:19:24 135  		raise_application_error(-20100, ''[&&scriptname] Errors detected while checking required ' || upper(p_privilege) || ' grants for user ' || upper(p_user) || '! Run the op-database-sysdba-upgrade.sql script to grant the correct privileges.'');
+20:19:24 136  	      else
+20:19:24 137  		dbms_output.put_line(''[&&scriptname] Finished ' || upper(p_privilege) || ' grants.'');
+20:19:24 138  	      end if;
+20:19:24 139  	    End;
+20:19:24 140  	  ';
+20:19:24 141  	end check_grants;
+20:19:24 142  
+20:19:24 143  	-- all upgrades
+20:19:24 144  	procedure all_upgrades_pre
+20:19:24 145  	as
+20:19:24 146  	begin
+20:19:24 147  	  If Upper('&&opx_aws_saas_install') = 'Y' Then
+20:19:24 148  	    -- AWS RDS admin user has extra grant privileges
+20:19:24 149  	    check_grants('&&opx_user_name',l_grant_list_read_aws, 'READ',    'APPLY');
+20:19:24 150  	    check_grants('&&opx_user_name',l_grant_list_execute,  'EXECUTE', 'APPLY');
+20:19:24 151  	    check_grants('&&opx_user_name',l_grant_list_select,   'SELECT',  'APPLY');
+20:19:24 152  	    check_grants('&&opx_user_name',l_grant_list_insert,   'INSERT',  'APPLY');
+20:19:24 153  	    check_grants('&&opx_user_name',l_grant_list_update,   'UPDATE',  'APPLY');
+20:19:24 154  	    check_grants('&&opx_user_name',l_grant_list_delete,   'DELETE',  'APPLY');
+20:19:24 155  	  else
+20:19:24 156  	    -- SYSTEM on-prem user does not have same grant privileges as SYSDBA
+20:19:24 157  	    check_grants('&&opx_user_name',l_grant_list_read,		'READ',    'APPLY');
+20:19:24 158  	    check_grants('&&opx_user_name',l_grant_list_read_checkonly, 'READ',    'CHECK');
+20:19:24 159  	    check_grants('&&opx_user_name',l_grant_list_execute,	'EXECUTE', 'CHECK');
+20:19:24 160  	    check_grants('&&opx_user_name',l_grant_list_select, 	'SELECT',  'CHECK');
+20:19:24 161  	    check_grants('&&opx_user_name',l_grant_list_insert, 	'INSERT',  'CHECK');
+20:19:24 162  	    check_grants('&&opx_user_name',l_grant_list_update, 	'UPDATE',  'CHECK');
+20:19:24 163  	    check_grants('&&opx_user_name',l_grant_list_delete, 	'DELETE',  'CHECK');
+20:19:24 164  	  end if;
+20:19:24 165  	  declare
+20:19:24 166  	    lv_count number;
+20:19:24 167  	    lv_stmt varchar2(400) := 'Grant CREATE JOB to &&opx_user_name';
+20:19:24 168  	  begin
+20:19:24 169  	    select count(*) into lv_count
+20:19:24 170  	      from dba_sys_privs
+20:19:24 171  	     where privilege = 'CREATE JOB'
+20:19:24 172  	       and grantee in ( upper('&&opx_user_name'), 'PUBLIC');
+20:19:24 173  	    if lv_count = 0 then
+20:19:24 174  	      dbms_output.put_line(lv_stmt);
+20:19:24 175  	      execute immediate lv_stmt;
+20:19:24 176  	    end if;
+20:19:24 177  	  end;
+20:19:24 178  	end all_upgrades_pre;
+20:19:24 179  
+20:19:24 180  begin
+20:19:24 181  	dbms_output.put_line('[&&scriptname] Parsing current version:  &&current_version');
+20:19:24 182  	select substr('&&current_version',1,
+20:19:24 183  	     case
+20:19:24 184  	       when instr('&&current_version','.',1,2) = 0
+20:19:24 185  	       then length('&&current_version')
+20:19:24 186  	       else instr('&&current_version','.',1,2) -1
+20:19:24 187  	     end
+20:19:24 188  	     )
+20:19:24 189  	into l_current_major_version
+20:19:24 190  	from dual;
+20:19:24 191  
+20:19:24 192  	if ( l_current_major_version = '' OR l_current_major_version is NULL ) then
+20:19:24 193  	  raise_application_error(-20100, 'ERROR: failed parsing current version! Exiting.');
+20:19:24 194  	else
+20:19:24 195  	  dbms_output.put_line('[&&scriptname] Current major version:	 ' || l_current_major_version);
+20:19:24 196  	end if;
+20:19:24 197  
+20:19:24 198  	select substr('&&current_version',1,instr('&&current_version','.',1,1)-1 )
+20:19:24 199  	into l_current_primary_version
+20:19:24 200  	from dual;
+20:19:24 201  
+20:19:24 202  	if ( l_current_primary_version = '' OR l_current_primary_version is NULL ) then
+20:19:24 203  	  raise_application_error(-20100, 'ERROR: failed parsing current version! Exiting.');
+20:19:24 204  	else
+20:19:24 205  	  dbms_output.put_line('[foo] Current primary version:	  ' || l_current_primary_version);
+20:19:24 206  	end if;
+20:19:24 207  
+20:19:24 208  	dbms_output.put_line('[&&scriptname] Parsing target build:     &&target_build');
+20:19:24 209  	select substr('&&target_build',
+20:19:24 210  		    instr('&&target_build',' ',1,1) + 1,
+20:19:24 211  		    instr('&&target_build',' ',1,2) - instr('&&target_build',' ',1,1) - 1)
+20:19:24 212  	  into l_target_version
+20:19:24 213  	  from dual;
+20:19:24 214  	if ( l_target_version = '' OR l_target_version is NULL ) then
+20:19:24 215  	  raise_application_error(-20100, 'ERROR: failed parsing target version! Exiting.');
+20:19:24 216  	else
+20:19:24 217  	  dbms_output.put_line('[&&scriptname] Target version:		 ' || l_target_version);
+20:19:24 218  	end if;
+20:19:24 219  
+20:19:24 220  	-- for major upgrades such as 8.x -> 9.0, allow re-running major upgrade only for AWS installations
+20:19:24 221  	-- example: Elsif '&&current_version' = '8.3' and upper('&&opx_aws_saas_install') = 'Y' Then
+20:19:24 222  
+20:19:24 223  	If l_current_primary_version >= 9 Then
+20:19:24 224  	  dbms_output.put_line('[&&scriptname] Running	&&current_version to ' || l_target_version || ' DBA Pre product upgrade');
+20:19:24 225  	  all_upgrades_pre;
+20:19:24 226  	  dbms_output.put_line('[&&scriptname] Finished &&current_version to ' || l_target_version || ' DBA Pre step successfully');
+20:19:24 227  	Else
+20:19:24 228  	  raise_application_error(-20100, 'This upgrade does not handle upgrading from the current database version of &&current_version to ' || l_target_version);
+20:19:24 229  	End If;
+20:19:24 230  exception
+20:19:24 231  	when others then
+20:19:24 232  	  raise;
+20:19:24 233  end;
+20:19:24 234  /
+[op-database-dba-upgrade.pre.sql] Parsing current version:  9.0.0.4
+[op-database-dba-upgrade.pre.sql] Current major version:    9.0
+[foo] Current primary version:	  9
+[op-database-dba-upgrade.pre.sql] Parsing target build:     OpenPages 9.0.0.4 Build 4510 2024/08/28
+[op-database-dba-upgrade.pre.sql] Target version:	    9.0.0.4
+[op-database-dba-upgrade.pre.sql] Running  9.0.0.4 to 9.0.0.4 DBA Pre product upgrade
+[op-database-dba-upgrade.pre.sql] Checking READ grants...
+Grant READ on GV$SQL to xxxxxx
+Grant READ on V$FILESTAT to xxxx
+declare
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges
+ORA-06512: at line 232
+ORA-06512: at line 86
+ORA-06512: at line 86
+ORA-06512: at line 109
+ORA-06512: at line 149
+ORA-06512: at line 225
+
+
+Disconnected from Oracle Database 19c Standard Edition 2 Release 19.0.0.0.0 - Production
+Version 19.22.0.0.0
+
+[2024-08-28 20:19:25+00:00] [op-database-dba-upgrade.sh] *** ERROR *** Database upgrade step failed when running op-database-dba-upgrade.pre.sql ; Please check log file: op-database-dba-upgrade.pre.20242808.201923.log
